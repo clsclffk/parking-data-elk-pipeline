@@ -1,0 +1,12 @@
+venv/
+.env
+data/*.xlsx
+scripts/__pycache__
+logs/*
+data/uuid
+data/dead_letter_queue
+data/queue
+data/.lock
+**/.ipynb_checkpoints/
+.gitignore.swp
+
