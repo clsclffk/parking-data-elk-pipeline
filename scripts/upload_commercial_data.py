@@ -10,6 +10,7 @@ from utils import (
 )
 from geopy.distance import geodesic
 from datetime import datetime
+import pytz
 
 load_dotenv()
 
@@ -126,9 +127,11 @@ def main():
     summary_df = add_parking_count(summary_df, parking_df)
 
     # 6. 데이터 수집 시각 컬럼 추가
-    now_ts = datetime.now().isoformat()
-    summary_df["timestamp"] = now_ts
-    categories_df["timestamp"] = now_ts
+    tz = pytz.timezone("Asia/Seoul")
+    now_ts = datetime.now(tz)
+
+    summary_df["timestamp"] = [now_ts] * len(summary_df)
+    categories_df["timestamp"] = [now_ts] * len(categories_df)
 
     # 7. 평균 주차장 가용률 추가
     summary_df = add_avg_available_rate(summary_df, parking_df)

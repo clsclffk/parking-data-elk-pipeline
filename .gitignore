@@ -1,5 +1,6 @@
 venv/
 .env
+data/*.csv
 data/*.xlsx
 scripts/__pycache__
 logs/*

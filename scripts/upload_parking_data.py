@@ -9,6 +9,7 @@ from utils import (
     compute_availability_and_status,
 )
 from datetime import datetime 
+import pytz
 
 load_dotenv()
 
@@ -55,8 +56,10 @@ def upload_to_elasticsearch(df, index_name="seoul_parking"):
             "add_time": row.get("ADD_PRK_HR"),                        # 추가 시간 (분)
             "hourly_rate": row.get("hourly_rate"),                    # 시간당 요금 (원/시간) = (기본 요금 / 기본 시간) * 60
             "timestamp": row.get("timestamp"),                        # 수집 시각 (스크립트 실행 시점)
-            "available_status": row.get("available_status"),          
-            "district": row.get("district"),
+            "available_status": row.get("available_status"),          # 혼잡도 상태 (여유 / 보통 / 혼잡 / 정보 없음)
+            "district": row.get("district"),                          # 구별 주소 (예: "강남구")
+            "weekday": row.get("weekday"),                            # 요일 (예: "월")
+            "weekday_order": row.get("weekday_order"),                # 요일 정렬용 인덱스 (0~6)
         }
     }
     for _, row in df.iterrows()
@@ -85,7 +88,17 @@ def main():
     df_status = compute_availability_and_status(df_geo)
 
     # 5. timestamp 열 추가
-    df_status["timestamp"] = datetime.now()
+    tz = pytz.timezone("Asia/Seoul")
+    now_kst = datetime.now(tz)
+    df_status["timestamp"] = [now_kst] * len(df_status)
+
+    # 5-1. 요일 파생 컬럼 추가 (예: "월", "화", ..., "일")
+    df_status["weekday"] = df_status["timestamp"].dt.dayofweek.map({
+        0: "월", 1: "화", 2: "수", 3: "목", 4: "금", 5: "토", 6: "일"
+    })
+
+    # 5-2. 요일 정렬용 컬럼 (요일 순서대로 시각화용 정렬 지원)
+    df_status["weekday_order"] = df_status["timestamp"].dt.dayofweek
 
     # 6. 시간당 요금 계산
     def calculate_hourly_rate(row):

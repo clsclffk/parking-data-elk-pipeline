@@ -165,7 +165,7 @@ def compute_availability_and_status(df):
 
 ## 2. 상권 데이터 
 # 2-1. 상권 데이터 불러오기
-def fetch_commercial_data(excel_path: str = "data/서울시 주요 120장소 목록.xlsx"):
+def fetch_commercial_data(excel_path: str = None):
     """
     서울시 주요 120개 장소의 상권 실시간 데이터를 API에서 불러와
     summary_df와 categories_df로 반환
@@ -177,6 +177,12 @@ def fetch_commercial_data(excel_path: str = "data/서울시 주요 120장소 목
         summary_df (pd.DataFrame): 상권 요약 정보
         categories_df (pd.DataFrame): 업종별 상세 정보
     """
+
+    if excel_path is None:
+        # 이 파일(utils.py)의 상위 디렉토리에 있는 data 폴더를 기준으로 경로 설정
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        excel_path = os.path.join(base_dir, "data", "서울시 주요 120장소 목록.xlsx")
+        
     df = pd.read_excel(excel_path)
     area_list = df['AREA_NM'].dropna().unique().tolist()
 
