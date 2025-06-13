@@ -10,6 +10,9 @@
 
 ---
 
+## 👀 대시보드 미리보기
+![Dashboard Overview](images/dashboard_overview.png)
+
 ## 🧰 사용 기술 스택
 
 - **Python**: 공공데이터 API 수집, 전처리
